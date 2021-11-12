@@ -39,13 +39,13 @@ public class LicenseService {
         }
     }
 
-    public String updateLicense(License license, String organizationId) throws MissingLicenseException {
+    public String updateLicense(License license, String newOrganizationId) throws MissingLicenseException {
         String responseMessage = null;
         if (license != null) {
-            var existingLicense = getLicense(license.getLicenseId(), organizationId);
-            existingLicense.setOrganizationId(organizationId);
+            var existingLicense = getLicense(license.getLicenseId(), license.getOrganizationId());
+            existingLicense.setOrganizationId(newOrganizationId);
             licenseRepository.save(existingLicense);
-            responseMessage = String.format("License [%s] has been updated with organization id [%s].", existingLicense.getLicenseId(), organizationId);
+            responseMessage = String.format("License [%s] has been updated with organization id [%s].", existingLicense.getLicenseId(), newOrganizationId);
         }
         return responseMessage;
     }
