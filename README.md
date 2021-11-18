@@ -2,10 +2,3 @@
 Part of the Orbsec-backend project
 
 
-#### Responsabilites
-- 
-- 
-
-#### Dependencies
-- 
-- 
