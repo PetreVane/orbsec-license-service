@@ -1,31 +1,58 @@
 package com.orbsec.licensingservice.model;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import lombok.*;
+import org.springframework.hateoas.RepresentationModel;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
+import javax.persistence.*;
 import java.util.UUID;
 
 
 @Entity
+@Table(name = "licenses")
 @Getter @Setter @ToString @NoArgsConstructor
-public class License {
+@JsonInclude(JsonInclude.Include.NON_NULL)
+public class License extends RepresentationModel<License> {
 
     @Id
     @GeneratedValue(generator = "UUID")
+    @Column(name = "auto_generated_id")
     private UUID id;
 
-    @Column(nullable = false, unique = true)
+    @Column(name= "license_id", nullable = false, unique = true)
     private String licenseId;
 
     @Column(nullable = false)
     private String description;
 
+    @Column(name = "organization_id")
     private String organizationId;
+
+    @Column(name = "product_name")
     private String productName;
+
+    @Column(name = "license_type")
     private String licenseType;
+
+    @Column(name="comment")
+    private String comment;
+
+    @Transient
+    private String organizationName;
+
+    @Transient
+    private String contactName;
+
+    @Transient
+    private String contactPhone;
+
+    @Transient
+    private String contactEmail;
+
+    public License withComment(String comment){
+        this.setComment(comment);
+        return this;
+    }
 
     public License(String licenseId, String description, String organizationId, String productName, String licenseType) {
         this.licenseId = licenseId;
