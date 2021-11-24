@@ -1,7 +1,6 @@
 package com.orbsec.licensingservice.controller;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
 import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
@@ -44,6 +43,7 @@ class LicenseControllerTest {
 
     @Test
     void itShouldGetLicense() throws MissingLicenseException {
+        // Given
         License license = new License();
         license.setId(UUID.randomUUID());
         license.setLicenseType("License Type");
@@ -58,48 +58,28 @@ class LicenseControllerTest {
         license.setLicenseId("42");
         license.setContactPhone("4105551212");
         LicenseRepository licenseRepository = mock(LicenseRepository.class);
+        // When
         when(licenseRepository.findLicenseByLicenseId(any())).thenReturn(Optional.of(license));
-        ResponseEntity<License> actualLicense = (new LicenseController(new LicenseService(licenseRepository)))
-                .getLicense("42", "42");
-        assertTrue(actualLicense.getHeaders().isEmpty());
-        assertTrue(actualLicense.hasBody());
-        assertEquals(HttpStatus.OK, actualLicense.getStatusCode());
+        ResponseEntity<License> actualLicense = (new LicenseController(new LicenseService(licenseRepository))).getLicense("42", "42");
+
+        // Then
+        assertThat(actualLicense.getHeaders().isEmpty()).isTrue();
+        assertThat(actualLicense.hasBody()).isTrue();
+        assertThat(actualLicense.getStatusCode()).isEqualTo(HttpStatus.OK);
+
+        // When
         License body = actualLicense.getBody();
-        assertEquals("42", body.getOrganizationId());
-        assertEquals(5, body.getLinks().toList().size());
-        assertTrue(body.hasLinks());
+        // Then
+        assertThat(body.getOrganizationId()).isEqualTo("42");
+        assertThat(body.getLinks().toList().size()).isEqualTo(5);
+        assertThat(body.hasLinks()).isTrue();
         verify(licenseRepository).findLicenseByLicenseId(any());
     }
 
-    @Test
-    void itShouldGetLicense2() throws MissingLicenseException {
-        License license = new License();
-        license.setId(UUID.randomUUID());
-        license.setLicenseType("License Type");
-        license.setOrganizationName("Organization Name");
-        license.setContactName("Contact Name");
-        license.setProductName("Product Name");
-        license.setContactEmail("jane.doe@example.org");
-        license.setDescription("The characteristics of someone or something");
-        license.setOrganizationId("42");
-        license.add(Link.of("Href"));
-        license.setComment("Comment");
-        license.setLicenseId("42");
-        license.setContactPhone("4105551212");
-        LicenseService licenseService = mock(LicenseService.class);
-        when(licenseService.getLicense((String) any(), (String) any())).thenReturn(license);
-        ResponseEntity<License> actualLicense = (new LicenseController(licenseService)).getLicense("42", "42");
-        assertTrue(actualLicense.getHeaders().isEmpty());
-        assertTrue(actualLicense.hasBody());
-        assertEquals(HttpStatus.OK, actualLicense.getStatusCode());
-        License body = actualLicense.getBody();
-        assertEquals(5, body.getLinks().toList().size());
-        assertTrue(body.hasLinks());
-        verify(licenseService).getLicense((String) any(), (String) any());
-    }
 
     @Test
     void itShouldCreateLicense() throws Exception {
+        // Given
         License license = new License();
         license.setId(UUID.randomUUID());
         license.setLicenseType("License Type");
@@ -114,6 +94,7 @@ class LicenseControllerTest {
         license.setLicenseId("42");
         license.setContactPhone("4105551212");
         String content = (new ObjectMapper()).writeValueAsString(license);
+        // When
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
                 .get("/api/v1/organization/{organizationId}/license", "42")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -121,14 +102,17 @@ class LicenseControllerTest {
         ResultActions actualPerformResult = MockMvcBuilders.standaloneSetup(this.licenseController)
                 .build()
                 .perform(requestBuilder);
+        // Then
         actualPerformResult.andExpect(MockMvcResultMatchers.status().is(405));
     }
 
     @Test
     void itShouldDeleteLicense() throws Exception {
-        when(this.licenseService.deleteLicense((String) any(), (String) any())).thenReturn("Delete License");
+        // When
+        when(this.licenseService.deleteLicense(any(), any())).thenReturn("Delete License");
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
                 .delete("/api/v1/organization/{organizationId}/license/{licenseId}", "42", "42");
+        // Then
         MockMvcBuilders.standaloneSetup(this.licenseController)
                 .build()
                 .perform(requestBuilder)
@@ -137,22 +121,10 @@ class LicenseControllerTest {
                 .andExpect(MockMvcResultMatchers.content().string("Delete License"));
     }
 
-    @Test
-    void itShouldDeleteLicense2() throws Exception {
-        when(this.licenseService.deleteLicense((String) any(), (String) any())).thenReturn("Delete License");
-        MockHttpServletRequestBuilder deleteResult = MockMvcRequestBuilders
-                .delete("/api/v1/organization/{organizationId}/license/{licenseId}", "42", "42");
-        deleteResult.contentType("Not all who wander are lost");
-        MockMvcBuilders.standaloneSetup(this.licenseController)
-                .build()
-                .perform(deleteResult)
-                .andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.content().contentType("text/plain;charset=ISO-8859-1"))
-                .andExpect(MockMvcResultMatchers.content().string("Delete License"));
-    }
 
     @Test
     void itShouldUpdateLicense() throws Exception {
+        // Given
         License license = new License();
         license.setId(UUID.randomUUID());
         license.setLicenseType("License Type");
@@ -167,6 +139,8 @@ class LicenseControllerTest {
         license.setLicenseId("42");
         license.setContactPhone("4105551212");
         String content = (new ObjectMapper()).writeValueAsString(license);
+
+        // When
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
                 .get("/api/v1/organization/{organizationId}/license", "42")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -174,6 +148,7 @@ class LicenseControllerTest {
         ResultActions actualPerformResult = MockMvcBuilders.standaloneSetup(this.licenseController)
                 .build()
                 .perform(requestBuilder);
+        // Then
         actualPerformResult.andExpect(MockMvcResultMatchers.status().is(405));
     }
 }
