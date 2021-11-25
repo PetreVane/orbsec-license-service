@@ -62,12 +62,6 @@
 			<scope>compile</scope>
 		</dependency>
 
-		<!-- https://mvnrepository.com/artifact/pl.project13.maven/git-commit-id-plugin -->
-		<dependency>
-			<groupId>pl.project13.maven</groupId>
-			<artifactId>git-commit-id-plugin</artifactId>
-			<version>4.9.9</version>
-		</dependency>
 
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
@@ -88,17 +82,7 @@
 
 	<build>
 		<plugins>
-
-			<plugin>
-				<groupId>pl.project13.maven</groupId>
-				<artifactId>git-commit-id-plugin</artifactId>
-			</plugin>
-
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-			</plugin>
-
+			
 			<!-- This plugin is used to create a docker image and publish the image to docker hub-->
 			<plugin>
 				<groupId>com.spotify</groupId>
