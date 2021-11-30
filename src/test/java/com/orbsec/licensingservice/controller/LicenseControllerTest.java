@@ -45,7 +45,6 @@ class LicenseControllerTest {
     void itShouldGetLicense() throws MissingLicenseException {
         // Given
         License license = new License();
-        license.setId(UUID.randomUUID());
         license.setLicenseType("License Type");
         license.setOrganizationName("Organization Name");
         license.setContactName("Contact Name");
@@ -81,7 +80,6 @@ class LicenseControllerTest {
     void itShouldCreateLicense() throws Exception {
         // Given
         License license = new License();
-        license.setId(UUID.randomUUID());
         license.setLicenseType("License Type");
         license.setOrganizationName("Organization Name");
         license.setContactName("Contact Name");
@@ -126,7 +124,6 @@ class LicenseControllerTest {
     void itShouldUpdateLicense() throws Exception {
         // Given
         License license = new License();
-        license.setId(UUID.randomUUID());
         license.setLicenseType("License Type");
         license.setOrganizationName("Organization Name");
         license.setContactName("Contact Name");
