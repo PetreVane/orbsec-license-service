@@ -1,11 +1,11 @@
 package com.orbsec.licensingservice.service.client;
 
 import com.orbsec.licensingservice.model.OrganizationDto;
-import org.springframework.cloud.netflix.feign.FeignClient;
+import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-@FeignClient(name = "organization-service", value = "/api/v1/organization")
+@FeignClient(name = "organization-service/api/v1/organization")
 public interface OrganizationFeignClient {
 
     @GetMapping(value="/{organizationId}", consumes = "application/json")

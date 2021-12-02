@@ -122,8 +122,8 @@
 		<!-- https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-starter-feign -->
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-feign</artifactId>
-			<version>1.4.7.RELEASE</version>
+			<artifactId>spring-cloud-starter-openfeign</artifactId>
+			<version>3.0.5</version>
 		</dependency>
 
 
