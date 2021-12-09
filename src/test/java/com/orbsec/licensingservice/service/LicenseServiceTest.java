@@ -31,20 +31,20 @@ class LicenseServiceTest {
         MockitoAnnotations.openMocks(this);
     }
 
-    @Test
-    void itShouldCreateLicense() {
-        // Given
-        String organizationId = "Under test Organization";
-        String licenseId = "0001";
-        License testLicense = new License(licenseId, "Under test license", organizationId, "Under test product", "Under test license type");
-
-        // When
-        underTest.createLicense(testLicense, organizationId);
-        // Then
-        then(licenseRepository).should().save(licenseArgumentCaptor.capture());
-        License fetchedLicense = licenseArgumentCaptor.getValue();
-        assertThat(fetchedLicense).isEqualTo(testLicense).isInstanceOf(License.class);
-    }
+//    @Test
+//    void itShouldCreateLicense() {
+//        // Given
+//        String organizationId = "Under test Organization";
+//        String licenseId = "0001";
+//        License testLicense = new License(licenseId, "Under test license", organizationId, "Under test product", "Under test license type");
+//
+//        // When
+//        underTest.createLicense(testLicense, organizationId);
+//        // Then
+//        then(licenseRepository).should().save(licenseArgumentCaptor.capture());
+//        License fetchedLicense = licenseArgumentCaptor.getValue();
+//        assertThat(fetchedLicense).isEqualTo(testLicense).isInstanceOf(License.class);
+//    }
 
 
     @Test
@@ -70,19 +70,19 @@ class LicenseServiceTest {
         verify(licenseRepository).delete(testLicense);
     }
 
-    @Test
-    void itShouldUpdateLicense() {
-        // Given
-        String organizationId = "Under test Organization";
-        String licenseId = "0001";
-        License testLicense = new License(licenseId, "Under test license", organizationId, "Under test product", "Under test license type");
-
-        // When
-        when(licenseRepository.findLicenseByLicenseId(licenseId)).thenReturn(Optional.of(testLicense));
-        // Then
-        underTest.updateLicense(testLicense, organizationId);
-        verify(licenseRepository).save(testLicense);
-        verify(licenseRepository).findLicenseByLicenseId(licenseId);
-    }
+//    @Test
+//    void itShouldUpdateLicense() {
+//        // Given
+//        String organizationId = "Under test Organization";
+//        String licenseId = "0001";
+//        License testLicense = new License(licenseId, "Under test license", organizationId, "Under test product", "Under test license type");
+//
+//        // When
+//        when(licenseRepository.findLicenseByLicenseId(licenseId)).thenReturn(Optional.of(testLicense));
+//        // Then
+//        underTest.updateLicense(testLicense, organizationId);
+//        verify(licenseRepository).save(testLicense);
+//        verify(licenseRepository).findLicenseByLicenseId(licenseId);
+//    }
 }
 
