@@ -91,7 +91,7 @@ public class LicenseService {
     @Retry(name ="retryLicenseDatabase", fallbackMethod = "getAllLicensesFallback")
     @Bulkhead(name = "bulkheadLicenseDatabase", fallbackMethod = "getAllLicensesFallback")
     public List<LicenseDTO> getAllLicenses() {
-        List<License> licenses = licenseRepository.findAll();
+        List<License> licenses = licenseRepository.findAllLicenses();
         return licenses.parallelStream().map(this::mapLicense).collect(Collectors.toList());
     }
 
