@@ -11,9 +11,8 @@ import java.util.Optional;
 public interface LicenseRepository extends CrudRepository<License, String> {
     Optional<License> findLicenseByLicenseId(String licenseId);
 
-    List<License> findLicenseByOrganizationId(String organizationId);
+    List<License> findAllByOrganizationId(String organizationId);
 
-    Optional<License> findLicenseByOrganizationIdAndLicenseId(String organizationId, String licenseId);
-
+    List<License> findAllLicenses();
 
 }
