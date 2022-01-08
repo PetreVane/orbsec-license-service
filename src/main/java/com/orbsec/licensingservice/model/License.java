@@ -6,7 +6,6 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import org.hibernate.Hibernate;
-import org.springframework.hateoas.RepresentationModel;
 
 import javax.persistence.*;
 import java.util.Objects;
@@ -15,7 +14,7 @@ import java.util.Objects;
 @Table(name = "licenses")
 @Getter @Setter @ToString @NoArgsConstructor
 @JsonInclude(JsonInclude.Include.NON_NULL)
-public class License extends RepresentationModel<License> {
+public class License {
 
     /*
     By using an auto-generated uuid, will make testing repository findById method difficult

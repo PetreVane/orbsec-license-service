@@ -97,7 +97,7 @@
 			<artifactId>spring-cloud-starter-bootstrap</artifactId>
 			<version>3.0.4</version>
 		</dependency>
-		
+
 		<!-- https://mvnrepository.com/artifact/org.modelmapper/modelmapper -->
 		<dependency>
 			<groupId>org.modelmapper</groupId>
