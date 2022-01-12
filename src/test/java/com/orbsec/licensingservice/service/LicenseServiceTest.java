@@ -161,12 +161,12 @@ class LicenseServiceTest {
 
     @Test
     void itShouldGetAllLicenses() {
-        when(this.licenseRepository.findAllLicenses()).thenReturn(new ArrayList<>());
+        when(this.licenseRepository.findAll()).thenReturn(new ArrayList<>());
 
         List<LicenseDTO> actualAllLicenses = this.licenseService.getAllLicenses();
 
         assertTrue(actualAllLicenses.isEmpty());
-        verify(this.licenseRepository).findAllLicenses();
+        verify(this.licenseRepository).findAll();
         assertEquals(actualAllLicenses, this.licenseService.getAllLicenses());
     }
 
