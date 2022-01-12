@@ -133,6 +133,10 @@ public class LicenseService {
 
     @SuppressWarnings("unused")
     private LicenseDTO getLicenseFallback(String licenseId, Throwable exception) {
+
+        if (exception instanceof MissingLicenseException) {
+            throw new MissingLicenseException("No license found");
+        }
         LOGGER.warn("@CircuitBreaker: called 'getLicenseFallback()' method ");
         return new LicenseDTO(NOT_AVAILABLE, FAKE_DATA, FAKE_DATA, FAKE_DATA, FAKE_DATA, FAKE_DATA, FAKE_DATA, FAKE_DATA, FAKE_DATA, FAKE_DATA);
     }
