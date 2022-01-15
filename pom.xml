@@ -10,7 +10,7 @@
 	</parent>
 	<groupId>com.orbsec</groupId>
 	<artifactId>licensing-service</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.1</version>
 	<name>licensing-service</name>
 	<description>Orbsec licensing service</description>
 	<properties>
@@ -179,8 +179,9 @@
 				<artifactId>dockerfile-maven-plugin</artifactId>
 				<version>1.4.13</version>
 				<configuration>
-					<repository>${docker.image.prefix}/${project.artifactId}</repository>
-					<tag>${project.version}</tag>
+					<repository>peter355/${docker.image.prefix}</repository>
+					<tag>${project.artifactId}-${project.version}</tag>
+					<useMavenSettingsForAuth>true</useMavenSettingsForAuth>
 					<buildArgs>
 						<JAR_FILE>target/${project.build.finalName}.jar</JAR_FILE>
 					</buildArgs>
