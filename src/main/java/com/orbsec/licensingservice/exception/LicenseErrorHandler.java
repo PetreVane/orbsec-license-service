@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 @ControllerAdvice
 public class LicenseErrorHandler {
 
-    private LicenseError errorGenerator(Exception e, HttpStatus statusCode) {
-        LicenseError error = new LicenseError();
+    private CustomError errorGenerator(Exception e, HttpStatus statusCode) {
+        CustomError error = new CustomError();
         error.setErrorMessage(e.getMessage());
         error.setStatusCode(statusCode.value());
         error.setTimestamp(System.currentTimeMillis());
@@ -17,8 +17,14 @@ public class LicenseErrorHandler {
     }
 
     @ExceptionHandler(MissingLicenseException.class)
-    public ResponseEntity<LicenseError> registrationErrorHandler(MissingLicenseException exception) {
+    public ResponseEntity<CustomError> registrationErrorHandler(MissingLicenseException exception) {
         var error = errorGenerator(exception, HttpStatus.NOT_FOUND);
         return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(UnauthorizedException.class)
+    public ResponseEntity<CustomError> unauthorizedExceptionHandler(UnauthorizedException exception) {
+        var error = errorGenerator(exception, HttpStatus.UNAUTHORIZED);
+        return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
     }
 }
