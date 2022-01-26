@@ -24,9 +24,7 @@ public class LicenseController {
     @RolesAllowed({ "ADMIN", "USER" })
     @GetMapping(value = "/{licenseId}", produces = "application/json")
     public ResponseEntity<LicenseDTO> getLicense(@PathVariable("licenseId") String licenseId) throws MissingLicenseException {
-        var licenseDTO = licenseService.getLicenseByLicenseId(licenseId);
-        var existingLicense = licenseService.mapDto(licenseDTO);
-        return ResponseEntity.ok(licenseService.mapLicense(existingLicense));
+        return ResponseEntity.ok(licenseService.getLicenseByLicenseId(licenseId));
     }
 
     @RolesAllowed({ "ADMIN", "USER" })
