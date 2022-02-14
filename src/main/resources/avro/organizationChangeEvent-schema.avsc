@@ -1,0 +1,27 @@
+{
+  "type": "record",
+  "name": "OrganizationChangeEvent",
+  "namespace": "com.orbsec.licensingservice.avro.model",
+  "fields": [
+    {
+      "name": "organizationId",
+      "type": "string"
+    },
+    {
+      "name": "changeType",
+      "type": {
+        "type": "enum",
+        "name": "ChangeType",
+        "symbols": [
+          "CREATION",
+          "UPDATE",
+          "DELETION"
+        ]
+      }
+    },
+    {
+      "name": "description",
+      "type": "string"
+    }
+  ]
+}
