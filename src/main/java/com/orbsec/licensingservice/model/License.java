@@ -16,12 +16,6 @@ import java.util.Objects;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class License {
 
-    /*
-    By using an auto-generated uuid, will make testing repository findById method difficult
-
-    @GeneratedValue(generator = "uuid")
-    @GenericGenerator(name = "uuid", strategy = "uuid")
-     */
     @Id
     @Column(name= "license_id", nullable = false, unique = true)
     private String licenseId;
