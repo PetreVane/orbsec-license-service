@@ -17,7 +17,7 @@
 		<java.version>11</java.version>
 		<docker.image.prefix>orbsec</docker.image.prefix>
 		<resilience4j.version>1.7.0</resilience4j.version>
-		<postgresql.version>42.3.2</postgresql.version>
+		<postgresql.version>42.3.3</postgresql.version>
 		<avro.version>1.11.0</avro.version>
 	</properties>
 	<dependencies>
