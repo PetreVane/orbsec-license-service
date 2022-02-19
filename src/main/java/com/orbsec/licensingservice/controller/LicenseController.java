@@ -54,6 +54,6 @@ public class LicenseController {
     @RolesAllowed("ADMIN")
     @DeleteMapping(value = "/{licenseId}")
     public ResponseEntity<String> deleteLicense(@PathVariable("licenseId") String licenseId) {
-        return ResponseEntity.ok(licenseService.deleteLicense(licenseId));
+        return ResponseEntity.ok(licenseService.deleteLicenseById(licenseId));
     }
 }
