@@ -230,7 +230,7 @@ class LicenseServiceTest {
         when(this.licenseRepository.findLicenseByLicenseId(any())).thenReturn(ofResult);
         String licenseId = "42";
 
-        String actualDeleteLicenseResult = this.licenseService.deleteLicense(licenseId);
+        String actualDeleteLicenseResult = this.licenseService.deleteLicenseById(licenseId);
 
         assertEquals("License with id [42] has been deleted successfully.", actualDeleteLicenseResult);
         verify(this.licenseRepository).delete(any());

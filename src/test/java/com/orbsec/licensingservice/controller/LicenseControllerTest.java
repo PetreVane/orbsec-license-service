@@ -100,7 +100,7 @@ class LicenseControllerTest {
     @Test
     void itShouldDeleteLicense() throws Exception {
         // When
-        when(this.licenseService.deleteLicense(any())).thenReturn("Delete License");
+        when(this.licenseService.deleteLicenseById(any())).thenReturn("Delete License");
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders.delete("/api/v1/license/{licenseId}", "42");
         MockMvc buildResult = MockMvcBuilders.standaloneSetup(this.licenseController).build();
 
