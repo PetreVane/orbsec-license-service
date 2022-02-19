@@ -21,37 +21,43 @@ public class LicenseController {
         this.licenseService = licenseService;
     }
 
-    @RolesAllowed({ "ADMIN", "USER" })
+    //TODO: Reactivate commented-out security rule
+//    @RolesAllowed({ "ADMIN", "USER" })
     @GetMapping(value = "/{licenseId}", produces = "application/json")
     public ResponseEntity<LicenseDTO> getLicense(@PathVariable("licenseId") String licenseId) throws MissingLicenseException {
         return ResponseEntity.ok(licenseService.getLicenseByLicenseId(licenseId));
     }
 
-    @RolesAllowed({ "ADMIN", "USER" })
+    //TODO: Reactivate commented-out security rule
+//    @RolesAllowed({ "ADMIN", "USER" })
     @GetMapping(value = "/organization/{organizationId}")
     public ResponseEntity<List<LicenseDTO>> getAllLicensesByOrganizationId(@PathVariable("organizationId") String organizationId) {
         return ResponseEntity.ok(licenseService.getLicensesByOrganizationId(organizationId));
     }
 
-    @RolesAllowed("ADMIN")
+    //TODO: Reactivate commented-out security rule
+//    @RolesAllowed("ADMIN")
     @GetMapping(value = "/all")
     public ResponseEntity<List<LicenseDTO>> fetchAllLicenses() {
         return ResponseEntity.ok(licenseService.getAllLicenses());
     }
 
-    @RolesAllowed({ "ADMIN", "USER" })
+    //TODO: Reactivate commented-out security rule
+//    @RolesAllowed({ "ADMIN", "USER" })
     @PostMapping(value = "/organization/{organizationId}")
     public ResponseEntity<String> createLicense(@PathVariable("organizationId") String organizationId, @RequestBody LicenseDTO licenseDTO) {
         return ResponseEntity.ok(licenseService.createLicense(licenseDTO, organizationId));
     }
 
-    @RolesAllowed("ADMIN")
+    //TODO: Reactivate commented-out security rule
+//    @RolesAllowed("ADMIN")
     @PutMapping(value = "/organization/{organizationId}")
     public ResponseEntity<String> updateLicense(@PathVariable("organizationId") String organizationId, @RequestBody LicenseDTO licenseDTO) {
         return ResponseEntity.ok(licenseService.updateLicense(licenseDTO, organizationId));
     }
 
-    @RolesAllowed("ADMIN")
+    //TODO: Reactivate commented-out security rule
+//    @RolesAllowed("ADMIN")
     @DeleteMapping(value = "/{licenseId}")
     public ResponseEntity<String> deleteLicense(@PathVariable("licenseId") String licenseId) {
         return ResponseEntity.ok(licenseService.deleteLicenseById(licenseId));
