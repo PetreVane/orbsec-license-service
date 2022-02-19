@@ -12,9 +12,6 @@ import org.springframework.stereotype.Component;
 @Getter @Setter
 public class ServiceConfig {
 
-    @Value("${spring.cloud.stream.bindings.input.destination}")
-    private String organization_topic = "";
-
     @Value("${spring.redis.host}")
     private String redisServer = "";
 
