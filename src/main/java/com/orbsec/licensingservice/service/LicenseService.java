@@ -3,49 +3,89 @@ package com.orbsec.licensingservice.service;
 import com.orbsec.licensingservice.exception.MissingLicenseException;
 import com.orbsec.licensingservice.model.License;
 import com.orbsec.licensingservice.model.LicenseDTO;
+import com.orbsec.licensingservice.model.OrganizationDto;
 import com.orbsec.licensingservice.repository.LicenseRepository;
+import com.orbsec.licensingservice.repository.OrganizationRedisRepository;
+import com.orbsec.licensingservice.service.client.OrganizationFeignClient;
 import io.github.resilience4j.bulkhead.annotation.Bulkhead;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import io.github.resilience4j.retry.annotation.Retry;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 public class LicenseService {
 
     private final LicenseRepository licenseRepository;
+    private final OrganizationFeignClient feignClient;
+    private final OrganizationRedisRepository redisRepository;
+
     private static final String FAKE_DATA = "not available";
     private static final String NOT_AVAILABLE = "License database service is not available. Try again later!";
-    private static final Logger LOGGER = LoggerFactory.getLogger(LicenseService.class);
-    private ModelMapper mapper;
+    private ModelMapper modelMapper;
 
     @Autowired
-    public LicenseService(LicenseRepository licenseRepository) {
+    public LicenseService(LicenseRepository licenseRepository, OrganizationRedisRepository redisRepository, OrganizationFeignClient feignClient) {
         this.licenseRepository = licenseRepository;
+        this.redisRepository = redisRepository;
+        this.feignClient = feignClient;
         configureMapper();
     }
 
     private void configureMapper() {
-        mapper = new ModelMapper();
-        mapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        modelMapper = new ModelMapper();
+        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
     }
 
     // Maps dto to object
     public License mapDto(LicenseDTO licenseDTO) {
-        return  mapper.map(licenseDTO, License.class);
+        return modelMapper.map(licenseDTO, License.class);
     }
 
     // Maps object to Dto
     public LicenseDTO mapLicense(License license) {
-        return mapper.map(license, LicenseDTO.class);
+        return modelMapper.map(license, LicenseDTO.class);
+    }
+
+    // Redis
+    // checks redis cache for record
+    public OrganizationDto checkRedisCacheFor(String organizationId) {
+        try {
+            return redisRepository.findById(organizationId).orElse(null);
+        } catch (Exception e) {
+            log.error("Errors while trying to get record from Redis cache: {}", e.getMessage());
+            return null;
+        }
+    }
+    // removes a record from redis cache
+    public void evictRedisCacheForOrganizationRecord(String organizationId) {
+        log.info("Attempting to evict redis record for id: {}", organizationId);
+        var cachedRecord = checkRedisCacheFor(organizationId);
+        if (cachedRecord != null) {
+            redisRepository.delete(cachedRecord);
+            log.info("Cache emptied for record with id {}", organizationId);
+        } else {
+            log.info("No cached record was found for id: {}", organizationId);
+        }
+    }
+
+    // Remote service
+    // asks remote service for an updated record & saves the record to redis cache
+    public OrganizationDto getUpdatedOrganizationRecord(String organizationId) {
+        log.info("Asking organization-service for an updated record for id: {}", organizationId);
+        var updatedRecord = feignClient.getOrganization(organizationId);
+        redisRepository.save(updatedRecord);
+        log.info("Saved updated record in redis cache for id: {}", organizationId);
+        return updatedRecord;
     }
 
     // Database calls
@@ -115,7 +155,7 @@ public class LicenseService {
     @CircuitBreaker(name = "licenseDatabase", fallbackMethod = "deleteLicenseFallback")
     @Retry(name ="retryLicenseDatabase", fallbackMethod = "deleteLicenseFallback")
     @Bulkhead(name = "bulkheadLicenseDatabase", fallbackMethod = "deleteLicenseFallback")
-    public String deleteLicense(String licenseId) throws MissingLicenseException {
+    public String deleteLicenseById(String licenseId) throws MissingLicenseException {
         String responseMessage;
         var licenseToBeDeleted = getLicenseByLicenseId(licenseId);
         licenseRepository.delete(mapDto(licenseToBeDeleted));
@@ -123,11 +163,21 @@ public class LicenseService {
         return responseMessage;
     }
 
+    public void deleteLicenseForOrganization(String organizationId) {
+        var licensesToBeDeleted = getLicensesByOrganizationId(organizationId);
+        if (licensesToBeDeleted.isEmpty()) {
+            log.info("No license records were found for organization id: {}", organizationId);
+        } else {
+            licensesToBeDeleted.parallelStream().forEach(licenseDTO -> deleteLicenseById(licenseDTO.getLicenseId()));
+            log.info("Successfully deleted all license records for organization id: {}", organizationId);
+        }
+    }
+
 
 //     Fallbacks
     @SuppressWarnings("unused")
     private String crudLicenseFallback(LicenseDTO licenseDTO, String organizationId, Throwable exception) {
-        LOGGER.warn("@CircuitBreaker: called 'crudLicenseFallback()' method ");
+        log.warn("@CircuitBreaker: called 'crudLicenseFallback()' method ");
         return NOT_AVAILABLE;
     }
 
@@ -137,19 +187,19 @@ public class LicenseService {
         if (exception instanceof MissingLicenseException) {
             throw new MissingLicenseException("No license found");
         }
-        LOGGER.warn("@CircuitBreaker: called 'getLicenseFallback()' method ");
+        log.warn("@CircuitBreaker: called 'getLicenseFallback()' method ");
         return new LicenseDTO(NOT_AVAILABLE, FAKE_DATA, FAKE_DATA, FAKE_DATA, FAKE_DATA, FAKE_DATA, FAKE_DATA, FAKE_DATA, FAKE_DATA, FAKE_DATA);
     }
 
     @SuppressWarnings("unused")
     private String deleteLicenseFallback(String licenseId, Throwable exception) {
-        LOGGER.warn("@CircuitBreaker: called 'getLicenseFallback()' method ");
+        log.warn("@CircuitBreaker: called 'getLicenseFallback()' method ");
         return NOT_AVAILABLE;
     }
 
     @SuppressWarnings("unused")
     private List<LicenseDTO> getAllLicensesFallback(Throwable exception) {
-        LOGGER.warn("@CircuitBreaker: called 'getAllLicensesFallback()' method ");
+        log.warn("@CircuitBreaker: called 'getAllLicensesFallback()' method ");
         List<LicenseDTO> licenseDTOS = new ArrayList<>();
         LicenseDTO licenseDTO = new LicenseDTO(NOT_AVAILABLE, FAKE_DATA, FAKE_DATA, FAKE_DATA, FAKE_DATA, FAKE_DATA, FAKE_DATA, FAKE_DATA, FAKE_DATA, FAKE_DATA);
         licenseDTOS.add(licenseDTO);
