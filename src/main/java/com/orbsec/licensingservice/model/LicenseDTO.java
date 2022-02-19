@@ -1,12 +1,11 @@
 package com.orbsec.licensingservice.model;
 
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
 @NoArgsConstructor @AllArgsConstructor
+@Getter @Setter
 public class LicenseDTO {
 
     private String licenseId;
