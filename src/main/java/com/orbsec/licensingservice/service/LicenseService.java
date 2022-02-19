@@ -106,6 +106,14 @@ public class LicenseService {
         return responseMessage;
     }
 
+    //TODO: create a new test License record automatically when a new Organization record is created
+    public void createTestLicenseForOrganization(String organizationID){
+        var organization = checkRedisCacheFor(organizationID);
+        LicenseDTO licenseDTO = new LicenseDTO();
+        licenseDTO.setLicenseId(String.valueOf(UUID.fromString(organizationID)));
+        licenseDTO.setLicenseType("Test license");
+    }
+
     @CircuitBreaker(name = "licenseDatabase", fallbackMethod = "getLicenseFallback")
     @Retry(name ="retryLicenseDatabase", fallbackMethod = "getLicenseFallback")
     @Bulkhead(name = "bulkheadLicenseDatabase", fallbackMethod = "getLicenseFallback")
