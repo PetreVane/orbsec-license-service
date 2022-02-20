@@ -1,6 +1,7 @@
 package com.orbsec.licensingservice.service;
 
 import com.orbsec.licensingservice.exception.MissingLicenseException;
+import com.orbsec.licensingservice.exception.RedisConnectionException;
 import com.orbsec.licensingservice.model.License;
 import com.orbsec.licensingservice.model.LicenseDTO;
 import com.orbsec.licensingservice.model.OrganizationDto;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
@@ -58,33 +60,45 @@ public class LicenseService {
 
     // Redis
     // checks redis cache for record
-    public OrganizationDto checkRedisCacheFor(String organizationId) {
+    public Optional<OrganizationDto> checkRedisCacheFor(String organizationId) {
+        log.info("Attempting to get organization record from Redis cache...");
         try {
-            return redisRepository.findById(organizationId).orElse(null);
+            return redisRepository.findById(organizationId);
         } catch (Exception e) {
             log.error("Errors while trying to get record from Redis cache: {}", e.getMessage());
-            return null;
+            throw new RedisConnectionException(e.getMessage());
+        }
+    }
+
+    public void saveOrganizationRecordIntoRedisCache(OrganizationDto organization) {
+        log.info("Attempting to save organization record into Redis cache");
+        try {
+            redisRepository.save(organization);
+            log.info("Successfully cached organization record with id {}", organization.getId());
+        } catch (Exception e) {
+            log.error("Errors while attempting to cache organization record: {}", e.getMessage());
         }
     }
     // removes a record from redis cache
     public void evictRedisCacheForOrganizationRecord(String organizationId) {
         log.info("Attempting to evict redis record for id: {}", organizationId);
         var cachedRecord = checkRedisCacheFor(organizationId);
-        if (cachedRecord != null) {
-            redisRepository.delete(cachedRecord);
+        if (cachedRecord.isPresent()) {
+            redisRepository.delete(cachedRecord.get());
             log.info("Cache emptied for record with id {}", organizationId);
         } else {
             log.info("No cached record was found for id: {}", organizationId);
         }
     }
 
+
     // Remote service
     // asks remote service for an updated record & saves the record to redis cache
     public OrganizationDto getUpdatedOrganizationRecord(String organizationId) {
         log.info("Asking organization-service for an updated record for id: {}", organizationId);
         var updatedRecord = feignClient.getOrganization(organizationId);
-        redisRepository.save(updatedRecord);
-        log.info("Saved updated record in redis cache for id: {}", organizationId);
+        saveOrganizationRecordIntoRedisCache(updatedRecord);
+        createDummyLicenseForOrganization(organizationId);
         return updatedRecord;
     }
 
@@ -107,11 +121,21 @@ public class LicenseService {
     }
 
     //TODO: create a new test License record automatically when a new Organization record is created
-    public void createTestLicenseForOrganization(String organizationID){
+    public void createDummyLicenseForOrganization(String organizationID){
+        log.info("Creating a dummy license for recently cached organzation record with id: {}", organizationID);
         var organization = checkRedisCacheFor(organizationID);
-        LicenseDTO licenseDTO = new LicenseDTO();
-        licenseDTO.setLicenseId(String.valueOf(UUID.fromString(organizationID)));
-        licenseDTO.setLicenseType("Test license");
+        if (organization.isPresent()) {
+            LicenseDTO licenseDTO = new LicenseDTO("42", "The characteristics of someone or something",
+                    "42", "Product Name",
+                    "License Type", "Test License",
+                    organization.get().getName(), organization.get().getContactName(),
+                    organization.get().getContactName(), organization.get().getContactEmail());
+
+            createLicense(licenseDTO, organization.get().getId());
+            log.info("Successfully saved dummy license for (cached) organization with id: {}",  organization.get().getId());
+        } else {
+            log.error("Failed creating dummy license for (cached) organization with id: {}", organizationID);
+        }
     }
 
     @CircuitBreaker(name = "licenseDatabase", fallbackMethod = "getLicenseFallback")
