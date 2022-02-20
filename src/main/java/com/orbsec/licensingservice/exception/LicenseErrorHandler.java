@@ -27,4 +27,10 @@ public class LicenseErrorHandler {
         var error = errorGenerator(exception, HttpStatus.UNAUTHORIZED);
         return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
     }
+
+    @ExceptionHandler(RedisConnectionException.class)
+    public ResponseEntity<CustomError> registrationErrorHandler(RedisConnectionException exception) {
+        var error = errorGenerator(exception, HttpStatus.SERVICE_UNAVAILABLE);
+        return new ResponseEntity<>(error, HttpStatus.SERVICE_UNAVAILABLE);
+    }
 }
