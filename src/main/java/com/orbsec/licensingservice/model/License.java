@@ -1,10 +1,7 @@
 package com.orbsec.licensingservice.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.*;
 import org.hibernate.Hibernate;
 
 import javax.persistence.*;
@@ -23,16 +20,16 @@ public class License {
     @Column(nullable = false)
     private String description;
 
-    @Column(name = "organization_id")
+    @Column(name = "organization_id", nullable = false)
     private String organizationId;
 
-    @Column(name = "product_name")
+    @Column(name = "product_name", nullable = false)
     private String productName;
 
-    @Column(name = "license_type")
+    @Column(name = "license_type", nullable = false)
     private String licenseType;
 
-    @Column(name="comment")
+    @Column(name="comment", nullable = false)
     private String comment;
 
     @Transient

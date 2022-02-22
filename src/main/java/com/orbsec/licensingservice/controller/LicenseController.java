@@ -1,15 +1,20 @@
 package com.orbsec.licensingservice.controller;
 
+import com.orbsec.licensingservice.exception.InvalidLicenseException;
 import com.orbsec.licensingservice.exception.MissingLicenseException;
 import com.orbsec.licensingservice.model.LicenseDTO;
 import com.orbsec.licensingservice.service.LicenseService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.security.RolesAllowed;
+import javax.validation.Valid;
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping(value = "/api/v1/license")
 public class LicenseController {
@@ -45,14 +50,23 @@ public class LicenseController {
     //TODO: Reactivate commented-out security rule
 //    @RolesAllowed({ "ADMIN", "USER" })
     @PostMapping(value = "/organization/{organizationId}")
-    public ResponseEntity<String> createLicense(@PathVariable("organizationId") String organizationId, @RequestBody LicenseDTO licenseDTO) {
+    public ResponseEntity<String> createLicense(@PathVariable("organizationId") String organizationId,
+                                                @Valid @RequestBody LicenseDTO licenseDTO, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            log.error("Input validation failed in createLicense method: {}", bindingResult.getFieldError().getField());
+            throw new InvalidLicenseException("Input validation failed");
+        }
         return ResponseEntity.ok(licenseService.createLicense(licenseDTO, organizationId));
     }
 
     //TODO: Reactivate commented-out security rule
 //    @RolesAllowed("ADMIN")
     @PutMapping(value = "/organization/{organizationId}")
-    public ResponseEntity<String> updateLicense(@PathVariable("organizationId") String organizationId, @RequestBody LicenseDTO licenseDTO) {
+    public ResponseEntity<String> updateLicense(@PathVariable("organizationId") String organizationId, @Valid @RequestBody LicenseDTO licenseDTO, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            log.error("Input validation failed in updateLicense method: {}", bindingResult.getFieldError().getField());
+            throw new InvalidLicenseException("Input validation failed");
+        }
         return ResponseEntity.ok(licenseService.updateLicense(licenseDTO, organizationId));
     }
 
