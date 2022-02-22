@@ -4,6 +4,7 @@ package com.orbsec.licensingservice.kafka;
 import com.orbsec.licensingservice.avro.model.ChangeType;
 import com.orbsec.licensingservice.avro.model.OrganizationChangeEvent;
 import com.orbsec.licensingservice.service.LicenseService;
+import com.orbsec.licensingservice.service.RedisService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,10 +16,12 @@ import org.springframework.stereotype.Component;
 public class OrganizationEventConsumer {
 
     private final LicenseService licenseService;
+    private final RedisService redisService;
 
     @Autowired
-    public OrganizationEventConsumer(LicenseService licenseService) {
+    public OrganizationEventConsumer(LicenseService licenseService, RedisService redisService) {
         this.licenseService = licenseService;
+        this.redisService = redisService;
     }
 
     @KafkaListener(id = "LicensingService-listener", topics = "organization_events", groupId = "licensingGroup")
@@ -43,13 +46,13 @@ public class OrganizationEventConsumer {
                 break;
             case UPDATE:
                 log.info("Attempting to update license information for organization ID: {}", organizationId );
-                licenseService.evictRedisCacheForOrganizationRecord(organizationId);
+                redisService.evictCacheFor(organizationId);
                 licenseService.getUpdatedOrganizationRecord(organizationId);
                 break;
             case DELETION:
                 log.info("Attempting to delete license records for organization ID: {}", organizationId );
                 licenseService.deleteLicenseForOrganization(organizationId);
-                licenseService.evictRedisCacheForOrganizationRecord(organizationId);
+                redisService.evictCacheFor(organizationId);
                 break;
         }
     }
