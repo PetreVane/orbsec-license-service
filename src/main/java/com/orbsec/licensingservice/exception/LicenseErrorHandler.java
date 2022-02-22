@@ -33,4 +33,10 @@ public class LicenseErrorHandler {
         var error = errorGenerator(exception, HttpStatus.SERVICE_UNAVAILABLE);
         return new ResponseEntity<>(error, HttpStatus.SERVICE_UNAVAILABLE);
     }
+
+    @ExceptionHandler(InvalidLicenseException.class)
+    public ResponseEntity<CustomError> invalidLicenseErrorHandler(InvalidLicenseException exception) {
+        var error = errorGenerator(exception, HttpStatus.BAD_REQUEST);
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
 }
