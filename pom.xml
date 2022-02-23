@@ -19,6 +19,7 @@
 		<resilience4j.version>1.7.0</resilience4j.version>
 		<postgresql.version>42.3.3</postgresql.version>
 		<avro.version>1.11.0</avro.version>
+		<release.train.version>2020.0.5</release.train.version>
 	</properties>
 	<dependencies>
 
@@ -104,14 +105,14 @@
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
-			<version>3.0.4</version>
+			<version>3.1.0</version>
 		</dependency>
 
 		<!-- https://mvnrepository.com/artifact/org.springframework.cloud/spring-cloud-starter-feign -->
 		<dependency>
 			<groupId>org.springframework.cloud</groupId>
 			<artifactId>spring-cloud-starter-openfeign</artifactId>
-			<version>3.0.5</version>
+			<version>3.1.0</version>
 		</dependency>
 
 		<!-- Resiliency dependencies		-->
@@ -220,6 +221,13 @@
 			<optional>true</optional>
 		</dependency>
 
+		<!-- Distributed tracing -->
+		<dependency>
+			<groupId>org.springframework.cloud</groupId>
+			<artifactId>spring-cloud-starter-sleuth</artifactId>
+			<version>3.1.0</version>
+		</dependency>
+
 	</dependencies>
 	<dependencyManagement>
 		<dependencies>
@@ -227,6 +235,13 @@
 				<groupId>org.keycloak.bom</groupId>
 				<artifactId>keycloak-adapter-bom</artifactId>
 				<version>11.0.2</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+			<dependency>
+				<groupId>org.springframework.cloud</groupId>
+				<artifactId>spring-cloud-dependencies</artifactId>
+				<version>${release.train.version}</version>
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
