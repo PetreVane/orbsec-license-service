@@ -10,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
-import javax.annotation.security.RolesAllowed;
 import javax.validation.Valid;
 import java.util.List;
 
@@ -34,18 +33,19 @@ public class LicenseController {
     }
 
     //TODO: Reactivate commented-out security rule
+//    @RolesAllowed("ADMIN")
+    @GetMapping(value = "/all")
+    public ResponseEntity<List<LicenseDTO>> getAllLicenses() {
+        return ResponseEntity.ok(licenseService.getAllLicenses());
+    }
+
+    //TODO: Reactivate commented-out security rule
 //    @RolesAllowed({ "ADMIN", "USER" })
     @GetMapping(value = "/organization/{organizationId}")
     public ResponseEntity<List<LicenseDTO>> getAllLicensesByOrganizationId(@PathVariable("organizationId") String organizationId) {
         return ResponseEntity.ok(licenseService.getLicensesByOrganizationId(organizationId));
     }
 
-    //TODO: Reactivate commented-out security rule
-//    @RolesAllowed("ADMIN")
-    @GetMapping(value = "/all")
-    public ResponseEntity<List<LicenseDTO>> fetchAllLicenses() {
-        return ResponseEntity.ok(licenseService.getAllLicenses());
-    }
 
     //TODO: Reactivate commented-out security rule
 //    @RolesAllowed({ "ADMIN", "USER" })
@@ -61,13 +61,15 @@ public class LicenseController {
 
     //TODO: Reactivate commented-out security rule
 //    @RolesAllowed("ADMIN")
-    @PutMapping(value = "/organization/{organizationId}")
-    public ResponseEntity<String> updateLicense(@PathVariable("organizationId") String organizationId, @Valid @RequestBody LicenseDTO licenseDTO, BindingResult bindingResult) {
+    @PutMapping(value = "/organization/{organizationId}/licenseId/{licenseId}")
+    public ResponseEntity<LicenseDTO> updateLicense(@PathVariable("organizationId") String organizationId,
+                                                    @PathVariable ("licenseId") String licenseId,
+                                                    @Valid @RequestBody LicenseDTO licenseDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             log.error("Input validation failed in updateLicense method: {}", bindingResult.getFieldError().getField());
             throw new InvalidLicenseException("Input validation failed");
         }
-        return ResponseEntity.ok(licenseService.updateLicense(licenseDTO, organizationId));
+        return ResponseEntity.ok(licenseService.updateLicenseForOrganization(organizationId, licenseId, licenseDTO));
     }
 
     //TODO: Reactivate commented-out security rule
