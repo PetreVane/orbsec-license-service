@@ -146,6 +146,26 @@ public class LicenseService {
         return responseMessage;
     }
 
+    @CircuitBreaker(name = "licenseDatabase", fallbackMethod = "updateLicenseFallback")
+    @Retry(name ="retryLicenseDatabase", fallbackMethod = "updateLicenseFallback")
+    @Bulkhead(name = "bulkheadLicenseDatabase", fallbackMethod = "updateLicenseFallback")
+    public LicenseDTO updateLicenseForOrganization(String organizationId, String licenseId, LicenseDTO update) {
+        // finds the license to be updated for the given organization id (there might be several licenses for one organization)
+        log.info("Attempting to find license with id {} for organization with id {}", licenseId, organizationId);
+        var existingLicense = licenseRepository.findLicensesByOrganizationIdAndLicenseId(organizationId, licenseId);
+        if (existingLicense.isPresent()) {
+            log.info("Found license with id {} for organization id {}", licenseId, organizationId);
+            var license = existingLicense.get();
+            modelMapper.map(update, license);
+            licenseRepository.save(license);
+            log.info("Successfully saved update for license id {}", licenseId);
+            return mapLicense(license);
+        } else {
+            log.error("Could not find any license for id {}", licenseId);
+            throw new MissingLicenseException(String.format("Could not find any license for id s%", licenseId));
+        }
+    }
+
     @CircuitBreaker(name = "licenseDatabase", fallbackMethod = "deleteLicenseFallback")
     @Retry(name ="retryLicenseDatabase", fallbackMethod = "deleteLicenseFallback")
     @Bulkhead(name = "bulkheadLicenseDatabase", fallbackMethod = "deleteLicenseFallback")
@@ -171,6 +191,12 @@ public class LicenseService {
     @SuppressWarnings("unused")
     private String crudLicenseFallback(LicenseDTO licenseDTO, String organizationId, Throwable exception) {
         log.warn("@CircuitBreaker: called 'crudLicenseFallback()' method ");
+        return NOT_AVAILABLE;
+    }
+
+    @SuppressWarnings("unused")
+    private String updateLicenseFallback(String organizationId, String licenseId, LicenseDTO licenseDTO, Throwable exception) {
+        log.warn("@CircuitBreaker: called 'updateLicenseFallback()' method ");
         return NOT_AVAILABLE;
     }
 
