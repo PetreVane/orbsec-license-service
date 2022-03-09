@@ -3,7 +3,7 @@
  *
  * DO NOT EDIT DIRECTLY
  */
-package com.orbsec.licensingservice.avro.model;
+package com.orbsec.licensingservice.model;
 @org.apache.avro.specific.AvroGenerated
 public enum ChangeType implements org.apache.avro.generic.GenericEnumSymbol<ChangeType> {
   CREATION, UPDATE, DELETION  ;

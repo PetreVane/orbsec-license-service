@@ -3,9 +3,8 @@
  *
  * DO NOT EDIT DIRECTLY
  */
-package com.orbsec.licensingservice.avro.model;
+package com.orbsec.licensingservice.model;
 
-import org.apache.avro.generic.GenericArray;
 import org.apache.avro.specific.SpecificData;
 import org.apache.avro.util.Utf8;
 import org.apache.avro.message.BinaryMessageEncoder;
@@ -74,7 +73,7 @@ public class OrganizationChangeEvent extends org.apache.avro.specific.SpecificRe
   }
 
   private java.lang.CharSequence organizationId;
-  private com.orbsec.licensingservice.avro.model.ChangeType changeType;
+  private ChangeType changeType;
   private java.lang.CharSequence description;
 
   /**
@@ -90,7 +89,7 @@ public class OrganizationChangeEvent extends org.apache.avro.specific.SpecificRe
    * @param changeType The new value for changeType
    * @param description The new value for description
    */
-  public OrganizationChangeEvent(java.lang.CharSequence organizationId, com.orbsec.licensingservice.avro.model.ChangeType changeType, java.lang.CharSequence description) {
+  public OrganizationChangeEvent(java.lang.CharSequence organizationId, ChangeType changeType, java.lang.CharSequence description) {
     this.organizationId = organizationId;
     this.changeType = changeType;
     this.description = description;
@@ -113,7 +112,7 @@ public class OrganizationChangeEvent extends org.apache.avro.specific.SpecificRe
   public void put(int field$, java.lang.Object value$) {
     switch (field$) {
     case 0: organizationId = (java.lang.CharSequence)value$; break;
-    case 1: changeType = (com.orbsec.licensingservice.avro.model.ChangeType)value$; break;
+    case 1: changeType = (ChangeType)value$; break;
     case 2: description = (java.lang.CharSequence)value$; break;
     default: throw new IndexOutOfBoundsException("Invalid index: " + field$);
     }
@@ -140,7 +139,7 @@ public class OrganizationChangeEvent extends org.apache.avro.specific.SpecificRe
    * Gets the value of the 'changeType' field.
    * @return The value of the 'changeType' field.
    */
-  public com.orbsec.licensingservice.avro.model.ChangeType getChangeType() {
+  public ChangeType getChangeType() {
     return changeType;
   }
 
@@ -149,7 +148,7 @@ public class OrganizationChangeEvent extends org.apache.avro.specific.SpecificRe
    * Sets the value of the 'changeType' field.
    * @param value the value to set.
    */
-  public void setChangeType(com.orbsec.licensingservice.avro.model.ChangeType value) {
+  public void setChangeType(ChangeType value) {
     this.changeType = value;
   }
 
@@ -174,8 +173,8 @@ public class OrganizationChangeEvent extends org.apache.avro.specific.SpecificRe
    * Creates a new OrganizationChangeEvent RecordBuilder.
    * @return A new OrganizationChangeEvent RecordBuilder
    */
-  public static com.orbsec.licensingservice.avro.model.OrganizationChangeEvent.Builder newBuilder() {
-    return new com.orbsec.licensingservice.avro.model.OrganizationChangeEvent.Builder();
+  public static OrganizationChangeEvent.Builder newBuilder() {
+    return new OrganizationChangeEvent.Builder();
   }
 
   /**
@@ -183,11 +182,11 @@ public class OrganizationChangeEvent extends org.apache.avro.specific.SpecificRe
    * @param other The existing builder to copy.
    * @return A new OrganizationChangeEvent RecordBuilder
    */
-  public static com.orbsec.licensingservice.avro.model.OrganizationChangeEvent.Builder newBuilder(com.orbsec.licensingservice.avro.model.OrganizationChangeEvent.Builder other) {
+  public static OrganizationChangeEvent.Builder newBuilder(OrganizationChangeEvent.Builder other) {
     if (other == null) {
-      return new com.orbsec.licensingservice.avro.model.OrganizationChangeEvent.Builder();
+      return new OrganizationChangeEvent.Builder();
     } else {
-      return new com.orbsec.licensingservice.avro.model.OrganizationChangeEvent.Builder(other);
+      return new OrganizationChangeEvent.Builder(other);
     }
   }
 
@@ -196,11 +195,11 @@ public class OrganizationChangeEvent extends org.apache.avro.specific.SpecificRe
    * @param other The existing instance to copy.
    * @return A new OrganizationChangeEvent RecordBuilder
    */
-  public static com.orbsec.licensingservice.avro.model.OrganizationChangeEvent.Builder newBuilder(com.orbsec.licensingservice.avro.model.OrganizationChangeEvent other) {
+  public static OrganizationChangeEvent.Builder newBuilder(OrganizationChangeEvent other) {
     if (other == null) {
-      return new com.orbsec.licensingservice.avro.model.OrganizationChangeEvent.Builder();
+      return new OrganizationChangeEvent.Builder();
     } else {
-      return new com.orbsec.licensingservice.avro.model.OrganizationChangeEvent.Builder(other);
+      return new OrganizationChangeEvent.Builder(other);
     }
   }
 
@@ -212,7 +211,7 @@ public class OrganizationChangeEvent extends org.apache.avro.specific.SpecificRe
     implements org.apache.avro.data.RecordBuilder<OrganizationChangeEvent> {
 
     private java.lang.CharSequence organizationId;
-    private com.orbsec.licensingservice.avro.model.ChangeType changeType;
+    private ChangeType changeType;
     private java.lang.CharSequence description;
 
     /** Creates a new Builder */
@@ -224,7 +223,7 @@ public class OrganizationChangeEvent extends org.apache.avro.specific.SpecificRe
      * Creates a Builder by copying an existing Builder.
      * @param other The existing Builder to copy.
      */
-    private Builder(com.orbsec.licensingservice.avro.model.OrganizationChangeEvent.Builder other) {
+    private Builder(OrganizationChangeEvent.Builder other) {
       super(other);
       if (isValidValue(fields()[0], other.organizationId)) {
         this.organizationId = data().deepCopy(fields()[0].schema(), other.organizationId);
@@ -244,7 +243,7 @@ public class OrganizationChangeEvent extends org.apache.avro.specific.SpecificRe
      * Creates a Builder by copying an existing OrganizationChangeEvent instance
      * @param other The existing instance to copy.
      */
-    private Builder(com.orbsec.licensingservice.avro.model.OrganizationChangeEvent other) {
+    private Builder(OrganizationChangeEvent other) {
       super(SCHEMA$, MODEL$);
       if (isValidValue(fields()[0], other.organizationId)) {
         this.organizationId = data().deepCopy(fields()[0].schema(), other.organizationId);
@@ -274,7 +273,7 @@ public class OrganizationChangeEvent extends org.apache.avro.specific.SpecificRe
       * @param value The value of 'organizationId'.
       * @return This builder.
       */
-    public com.orbsec.licensingservice.avro.model.OrganizationChangeEvent.Builder setOrganizationId(java.lang.CharSequence value) {
+    public OrganizationChangeEvent.Builder setOrganizationId(java.lang.CharSequence value) {
       validate(fields()[0], value);
       this.organizationId = value;
       fieldSetFlags()[0] = true;
@@ -294,7 +293,7 @@ public class OrganizationChangeEvent extends org.apache.avro.specific.SpecificRe
       * Clears the value of the 'organizationId' field.
       * @return This builder.
       */
-    public com.orbsec.licensingservice.avro.model.OrganizationChangeEvent.Builder clearOrganizationId() {
+    public OrganizationChangeEvent.Builder clearOrganizationId() {
       organizationId = null;
       fieldSetFlags()[0] = false;
       return this;
@@ -304,7 +303,7 @@ public class OrganizationChangeEvent extends org.apache.avro.specific.SpecificRe
       * Gets the value of the 'changeType' field.
       * @return The value.
       */
-    public com.orbsec.licensingservice.avro.model.ChangeType getChangeType() {
+    public ChangeType getChangeType() {
       return changeType;
     }
 
@@ -314,7 +313,7 @@ public class OrganizationChangeEvent extends org.apache.avro.specific.SpecificRe
       * @param value The value of 'changeType'.
       * @return This builder.
       */
-    public com.orbsec.licensingservice.avro.model.OrganizationChangeEvent.Builder setChangeType(com.orbsec.licensingservice.avro.model.ChangeType value) {
+    public OrganizationChangeEvent.Builder setChangeType(ChangeType value) {
       validate(fields()[1], value);
       this.changeType = value;
       fieldSetFlags()[1] = true;
@@ -334,7 +333,7 @@ public class OrganizationChangeEvent extends org.apache.avro.specific.SpecificRe
       * Clears the value of the 'changeType' field.
       * @return This builder.
       */
-    public com.orbsec.licensingservice.avro.model.OrganizationChangeEvent.Builder clearChangeType() {
+    public OrganizationChangeEvent.Builder clearChangeType() {
       changeType = null;
       fieldSetFlags()[1] = false;
       return this;
@@ -354,7 +353,7 @@ public class OrganizationChangeEvent extends org.apache.avro.specific.SpecificRe
       * @param value The value of 'description'.
       * @return This builder.
       */
-    public com.orbsec.licensingservice.avro.model.OrganizationChangeEvent.Builder setDescription(java.lang.CharSequence value) {
+    public OrganizationChangeEvent.Builder setDescription(java.lang.CharSequence value) {
       validate(fields()[2], value);
       this.description = value;
       fieldSetFlags()[2] = true;
@@ -374,7 +373,7 @@ public class OrganizationChangeEvent extends org.apache.avro.specific.SpecificRe
       * Clears the value of the 'description' field.
       * @return This builder.
       */
-    public com.orbsec.licensingservice.avro.model.OrganizationChangeEvent.Builder clearDescription() {
+    public OrganizationChangeEvent.Builder clearDescription() {
       description = null;
       fieldSetFlags()[2] = false;
       return this;
@@ -386,7 +385,7 @@ public class OrganizationChangeEvent extends org.apache.avro.specific.SpecificRe
       try {
         OrganizationChangeEvent record = new OrganizationChangeEvent();
         record.organizationId = fieldSetFlags()[0] ? this.organizationId : (java.lang.CharSequence) defaultValue(fields()[0]);
-        record.changeType = fieldSetFlags()[1] ? this.changeType : (com.orbsec.licensingservice.avro.model.ChangeType) defaultValue(fields()[1]);
+        record.changeType = fieldSetFlags()[1] ? this.changeType : (ChangeType) defaultValue(fields()[1]);
         record.description = fieldSetFlags()[2] ? this.description : (java.lang.CharSequence) defaultValue(fields()[2]);
         return record;
       } catch (org.apache.avro.AvroMissingFieldException e) {
@@ -435,7 +434,7 @@ public class OrganizationChangeEvent extends org.apache.avro.specific.SpecificRe
     if (fieldOrder == null) {
       this.organizationId = in.readString(this.organizationId instanceof Utf8 ? (Utf8)this.organizationId : null);
 
-      this.changeType = com.orbsec.licensingservice.avro.model.ChangeType.values()[in.readEnum()];
+      this.changeType = ChangeType.values()[in.readEnum()];
 
       this.description = in.readString(this.description instanceof Utf8 ? (Utf8)this.description : null);
 
@@ -447,7 +446,7 @@ public class OrganizationChangeEvent extends org.apache.avro.specific.SpecificRe
           break;
 
         case 1:
-          this.changeType = com.orbsec.licensingservice.avro.model.ChangeType.values()[in.readEnum()];
+          this.changeType = ChangeType.values()[in.readEnum()];
           break;
 
         case 2:
