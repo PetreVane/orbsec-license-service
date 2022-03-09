@@ -22,7 +22,7 @@ public class RedisService {
 
 
     public void saveRecordIntoCache(OrganizationDto organization) {
-        log.info("Attempting to save organization record into Redis cache");
+        log.info("Attempting to save organization record into Redis cache. Id: {}", organization.getId());
         try {
             redisRepository.save(organization);
             log.info("Successfully cached organization record with id {}", organization.getId());
@@ -33,9 +33,11 @@ public class RedisService {
 
     // checks redis cache for record
     public Optional<OrganizationDto> checkCacheFor(String organizationId) {
-        log.info("Attempting to get organization record from Redis cache...");
+        log.info("Attempting to get organization record from Redis cache, for id {}", organizationId);
         try {
-            return redisRepository.findById(organizationId);
+            var cachedRecord =  redisRepository.findById(organizationId);
+            log.info("Successfully fetched Redis cached record with id {}", organizationId);
+            return cachedRecord;
         } catch (Exception e) {
             log.error("Errors while trying to get record from Redis cache: {}", e.getMessage());
             throw new RedisConnectionException(e.getMessage());
