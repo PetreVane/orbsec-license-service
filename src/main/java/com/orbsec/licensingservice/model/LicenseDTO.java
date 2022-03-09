@@ -3,7 +3,6 @@ package com.orbsec.licensingservice.model;
 
 import lombok.*;
 
-import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 
 @Data
@@ -28,15 +27,11 @@ public class LicenseDTO {
     @NotEmpty
     private String comment;
 
-    @NotEmpty
     private String organizationName;
 
-    @NotEmpty
     private String contactName;
 
-    @NotEmpty
     private String contactPhone;
 
-    @Email
     private String contactEmail;
 }
