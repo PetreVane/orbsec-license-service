@@ -1,13 +1,10 @@
 package com.orbsec.licensingservice.kafka.deserializer;
 
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.orbsec.licensingservice.avro.model.OrganizationChangeEvent;
+import com.orbsec.licensingservice.model.OrganizationChangeEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.common.header.Headers;
 import org.apache.kafka.common.serialization.Deserializer;
-import org.apache.kafka.common.serialization.Serializer;
 
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
