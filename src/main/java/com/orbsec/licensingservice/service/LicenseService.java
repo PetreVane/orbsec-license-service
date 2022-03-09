@@ -15,8 +15,7 @@ import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -54,13 +53,19 @@ public class LicenseService {
         return modelMapper.map(license, LicenseDTO.class);
     }
 
-    // Remote service
+    // checks redis cache for record; if not present, asks remote service for a record
+    private OrganizationDto checkRedisCacheFor(String organizationId) {
+        var cachedRecord = redisService.checkCacheFor(organizationId);
+        var result = cachedRecord.isPresent() ? cachedRecord.get() : getUpdatedOrganizationRecord(organizationId);
+        return result;
+    }
+
+
     // asks remote service for an updated record & saves the record into redis cache
     public OrganizationDto getUpdatedOrganizationRecord(String organizationId) {
         log.info("Asking organization-service for an updated record for id: {}", organizationId);
         var updatedRecord = feignClient.getOrganization(organizationId);
         redisService.saveRecordIntoCache(updatedRecord);
-        createDummyLicenseForOrganization(organizationId);
         return updatedRecord;
     }
 
@@ -69,36 +74,22 @@ public class LicenseService {
     @Retry(name ="retryLicenseDatabase", fallbackMethod = "crudLicenseFallback")
     @Bulkhead(name = "bulkheadLicenseDatabase", fallbackMethod = "crudLicenseFallback")
     public String createLicense(LicenseDTO licenseDTO, String organizationId) {
+        log.info("Creating a new license for organization id: {}", organizationId);
+        // check if there is a cached organization for the provided id
+        var organization = checkRedisCacheFor(organizationId);
+        // maps the incoming license dto
         var license = mapDto(licenseDTO);
-        String responseMessage;
-        if (license != null) {
-            license.setOrganizationId(organizationId);
-            licenseRepository.save(license);
-            responseMessage = String.format("License has been saved for organizationId: %s", organizationId);
-        } else {
-            responseMessage = "Invalid license!";
-            return responseMessage;
-        }
+        license.setLicenseId(String.valueOf(UUID.randomUUID()));
+        license.setOrganizationId(organizationId);
+        license.setOrganizationName(organization.getName());
+        license.setContactPhone(organization.getContactPhone());
+        license.setContactEmail(organization.getContactEmail());
+        licenseRepository.save(license);
+        String responseMessage = String.format("A new license has been saved for organizationId %s ", organizationId);
+        log.info("A new license has been saved for organizationId: {}", organizationId);
         return responseMessage;
     }
 
-    //TODO: create a new test License record automatically when a new Organization record is created
-    public void createDummyLicenseForOrganization(String organizationID){
-        log.info("Creating a dummy license for recently cached organzation record with id: {}", organizationID);
-        var organization = redisService.checkCacheFor(organizationID);
-        if (organization.isPresent()) {
-            LicenseDTO licenseDTO = new LicenseDTO("42", "The characteristics of someone or something",
-                    "42", "Product Name",
-                    "License Type", "Test License",
-                    organization.get().getName(), organization.get().getContactName(),
-                    organization.get().getContactName(), organization.get().getContactEmail());
-
-            createLicense(licenseDTO, organization.get().getId());
-            log.info("Successfully saved dummy license for (cached) organization with id: {}",  organization.get().getId());
-        } else {
-            log.error("Failed creating dummy license for (cached) organization with id: {}", organizationID);
-        }
-    }
 
     @CircuitBreaker(name = "licenseDatabase", fallbackMethod = "getLicenseFallback")
     @Retry(name ="retryLicenseDatabase", fallbackMethod = "getLicenseFallback")
@@ -106,8 +97,7 @@ public class LicenseService {
     public LicenseDTO getLicenseByLicenseId(String licenseId) throws MissingLicenseException {
         var existingLicense = licenseRepository.findLicenseByLicenseId(licenseId);
         if (existingLicense.isPresent()) {
-            License license = existingLicense.get();
-            return mapLicense(license);
+            return mapLicense(existingLicense.get());
         } else {
             throw new MissingLicenseException("No license found");
         }
@@ -126,24 +116,34 @@ public class LicenseService {
     @Bulkhead(name = "bulkheadLicenseDatabase", fallbackMethod = "getAllLicensesFallback")
     public List<LicenseDTO> getAllLicenses() {
         List<License> licenses = (List<License>) licenseRepository.findAll();
-        return licenses.parallelStream().map(this::mapLicense).collect(Collectors.toList());
+        return licenses.parallelStream()
+                .map(this::updateLicenseWithOrganizationData)
+                .map(this::mapLicense)
+                .collect(Collectors.toList());
+    }
+
+    // Updates license with Organization data, for which the license belongs
+    // Organization data is not saved within license database
+    private License updateLicenseWithOrganizationData(License license) {
+        var organization = checkRedisCacheFor(license.getOrganizationId());
+        license.setOrganizationName(organization.getName());
+        license.setContactName(organization.getContactName());
+        license.setContactPhone(organization.getContactPhone());
+        license.setContactEmail(organization.getContactEmail());
+        return license;
     }
 
 
-    //TODO: update this method to accept a LicenseId as search parameter & organizationId as the value to be updated
     @CircuitBreaker(name = "licenseDatabase", fallbackMethod = "crudLicenseFallback")
     @Retry(name ="retryLicenseDatabase", fallbackMethod = "crudLicenseFallback")
     @Bulkhead(name = "bulkheadLicenseDatabase", fallbackMethod = "crudLicenseFallback")
     public String updateLicense(LicenseDTO licenseDTO, String newOrganizationId) throws MissingLicenseException {
-        String responseMessage = null;
-        if (licenseDTO != null) {
-            var existingLicenseDto = getLicenseByLicenseId(licenseDTO.getLicenseId());
-            License licenseToBeUpdated = mapDto(existingLicenseDto);
-            licenseToBeUpdated.setOrganizationId(newOrganizationId);
-            licenseRepository.save(licenseToBeUpdated);
-            responseMessage = String.format("License [%s] has been updated with organization id [%s].", licenseToBeUpdated.getLicenseId(), newOrganizationId);
-        }
-        return responseMessage;
+        var existingLicenseDto = getLicenseByLicenseId(licenseDTO.getLicenseId());
+        License licenseToBeUpdated = mapDto(existingLicenseDto);
+        licenseToBeUpdated.setOrganizationId(newOrganizationId);
+        licenseRepository.save(licenseToBeUpdated);
+        return String.format("License %s has been updated with organization id %s", licenseToBeUpdated.getLicenseId(), newOrganizationId);
+
     }
 
     @CircuitBreaker(name = "licenseDatabase", fallbackMethod = "updateLicenseFallback")
@@ -152,7 +152,8 @@ public class LicenseService {
     public LicenseDTO updateLicenseForOrganization(String organizationId, String licenseId, LicenseDTO update) {
         // finds the license to be updated for the given organization id (there might be several licenses for one organization)
         log.info("Attempting to find license with id {} for organization with id {}", licenseId, organizationId);
-        var existingLicense = licenseRepository.findLicensesByOrganizationIdAndLicenseId(organizationId, licenseId);
+        var existingLicense = licenseRepository.findLicenseByLicenseId(licenseId);
+
         if (existingLicense.isPresent()) {
             log.info("Found license with id {} for organization id {}", licenseId, organizationId);
             var license = existingLicense.get();
@@ -162,7 +163,7 @@ public class LicenseService {
             return mapLicense(license);
         } else {
             log.error("Could not find any license for id {}", licenseId);
-            throw new MissingLicenseException(String.format("Could not find any license for id s%", licenseId));
+            throw new MissingLicenseException(String.format("Could not find any license for id %s ", licenseId));
         }
     }
 
@@ -195,9 +196,13 @@ public class LicenseService {
     }
 
     @SuppressWarnings("unused")
-    private String updateLicenseFallback(String organizationId, String licenseId, LicenseDTO licenseDTO, Throwable exception) {
+    private LicenseDTO updateLicenseFallback(String organizationId, String licenseId, LicenseDTO licenseDTO, Throwable exception) {
         log.warn("@CircuitBreaker: called 'updateLicenseFallback()' method ");
-        return NOT_AVAILABLE;
+        if (exception instanceof MissingLicenseException) {
+            log.error("updateLicenseFallback: Could not find any license for id {}", licenseId);
+            throw new MissingLicenseException(String.format("Could not find any license for id s%", licenseId));
+        }
+        return new LicenseDTO(NOT_AVAILABLE, FAKE_DATA, FAKE_DATA, FAKE_DATA, FAKE_DATA, FAKE_DATA, FAKE_DATA, FAKE_DATA, FAKE_DATA, FAKE_DATA);
     }
 
     @SuppressWarnings("unused")
