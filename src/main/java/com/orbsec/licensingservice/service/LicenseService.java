@@ -44,12 +44,12 @@ public class LicenseService {
     }
 
     // Maps dto to object
-    public License mapDto(LicenseDTO licenseDTO) {
+    private License mapDto(LicenseDTO licenseDTO) {
         return modelMapper.map(licenseDTO, License.class);
     }
 
     // Maps object to Dto
-    public LicenseDTO mapLicense(License license) {
+    private LicenseDTO mapLicense(License license) {
         return modelMapper.map(license, LicenseDTO.class);
     }
 
@@ -133,19 +133,6 @@ public class LicenseService {
         return license;
     }
 
-
-    @CircuitBreaker(name = "licenseDatabase", fallbackMethod = "crudLicenseFallback")
-    @Retry(name ="retryLicenseDatabase", fallbackMethod = "crudLicenseFallback")
-    @Bulkhead(name = "bulkheadLicenseDatabase", fallbackMethod = "crudLicenseFallback")
-    public String updateLicense(LicenseDTO licenseDTO, String newOrganizationId) throws MissingLicenseException {
-        var existingLicenseDto = getLicenseByLicenseId(licenseDTO.getLicenseId());
-        License licenseToBeUpdated = mapDto(existingLicenseDto);
-        licenseToBeUpdated.setOrganizationId(newOrganizationId);
-        licenseRepository.save(licenseToBeUpdated);
-        return String.format("License %s has been updated with organization id %s", licenseToBeUpdated.getLicenseId(), newOrganizationId);
-
-    }
-
     @CircuitBreaker(name = "licenseDatabase", fallbackMethod = "updateLicenseFallback")
     @Retry(name ="retryLicenseDatabase", fallbackMethod = "updateLicenseFallback")
     @Bulkhead(name = "bulkheadLicenseDatabase", fallbackMethod = "updateLicenseFallback")
@@ -200,7 +187,7 @@ public class LicenseService {
         log.warn("@CircuitBreaker: called 'updateLicenseFallback()' method ");
         if (exception instanceof MissingLicenseException) {
             log.error("updateLicenseFallback: Could not find any license for id {}", licenseId);
-            throw new MissingLicenseException(String.format("Could not find any license for id s%", licenseId));
+            throw new MissingLicenseException("Could not find any license for id ");
         }
         return new LicenseDTO(NOT_AVAILABLE, FAKE_DATA, FAKE_DATA, FAKE_DATA, FAKE_DATA, FAKE_DATA, FAKE_DATA, FAKE_DATA, FAKE_DATA, FAKE_DATA);
     }
