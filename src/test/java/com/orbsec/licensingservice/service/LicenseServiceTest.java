@@ -413,7 +413,7 @@ class LicenseServiceTest {
     void itShouldDeleteAllLicensesForOrganization() {
         ArrayList<License> licenseList = new ArrayList<>();
         when(this.licenseRepository.findAllByOrganizationId(any())).thenReturn(licenseList);
-        this.licenseService.deleteLicenseForOrganization("12342");
+        this.licenseService.deleteAllLicensesForOrganization("12342");
         verify(this.licenseRepository).findAllByOrganizationId(any());
         assertEquals(licenseList, this.licenseService.getAllLicenses());
     }
@@ -442,7 +442,7 @@ class LicenseServiceTest {
         when(this.licenseRepository.findLicenseByLicenseId(any())).thenReturn(optionalResult);
         when(this.licenseRepository.findAllByOrganizationId(any())).thenReturn(licenseList);
 
-        this.licenseService.deleteLicenseForOrganization("12342");
+        this.licenseService.deleteAllLicensesForOrganization("12342");
 
         verify(this.licenseRepository).findAllByOrganizationId(any());
         verify(this.licenseRepository).findLicenseByLicenseId(any());

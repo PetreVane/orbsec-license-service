@@ -51,7 +51,7 @@ public class OrganizationEventConsumer {
                 break;
             case DELETION:
                 log.info("Attempting to delete license records for organization ID: {}", organizationId );
-                licenseService.deleteLicenseForOrganization(organizationId);
+                licenseService.deleteAllLicensesForOrganization(organizationId);
                 redisService.evictCacheFor(organizationId);
                 break;
         }
