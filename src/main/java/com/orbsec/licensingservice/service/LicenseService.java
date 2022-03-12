@@ -26,8 +26,8 @@ public class LicenseService {
     private final OrganizationFeignClient feignClient;
     private final RedisService redisService;
 
-    private static final String FAKE_DATA = "not available";
-    private static final String NOT_AVAILABLE = "License database service is not available. Try again later!";
+    private static final String NOT_AVAILABLE = "not available";
+    private static final String DESCRIPTION = "License database service is not available. Try again later!";
     private ModelMapper modelMapper;
 
     @Autowired
@@ -56,8 +56,7 @@ public class LicenseService {
     // checks redis cache for record; if not present, asks remote service for a record
     private OrganizationDto checkRedisCacheFor(String organizationId) {
         var cachedRecord = redisService.checkCacheFor(organizationId);
-        var result = cachedRecord.isPresent() ? cachedRecord.get() : getUpdatedOrganizationRecord(organizationId);
-        return result;
+        return cachedRecord.isPresent() ? cachedRecord.get() : getUpdatedOrganizationRecord(organizationId);
     }
 
 
@@ -165,7 +164,7 @@ public class LicenseService {
         return responseMessage;
     }
 
-    public void deleteLicenseForOrganization(String organizationId) {
+    public void deleteAllLicensesForOrganization(String organizationId) {
         var licensesToBeDeleted = getLicensesByOrganizationId(organizationId);
         if (licensesToBeDeleted.isEmpty()) {
             log.info("No license records were found for organization id: {}", organizationId);
@@ -179,7 +178,7 @@ public class LicenseService {
     @SuppressWarnings("unused")
     private String crudLicenseFallback(LicenseDTO licenseDTO, String organizationId, Throwable exception) {
         log.warn("@CircuitBreaker: called 'crudLicenseFallback()' method ");
-        return NOT_AVAILABLE;
+        return DESCRIPTION;
     }
 
     @SuppressWarnings("unused")
@@ -189,7 +188,7 @@ public class LicenseService {
             log.error("updateLicenseFallback: Could not find any license for id {}", licenseId);
             throw new MissingLicenseException("Could not find any license for id ");
         }
-        return new LicenseDTO(NOT_AVAILABLE, FAKE_DATA, FAKE_DATA, FAKE_DATA, FAKE_DATA, FAKE_DATA, FAKE_DATA, FAKE_DATA, FAKE_DATA, FAKE_DATA);
+        return new LicenseDTO(DESCRIPTION, NOT_AVAILABLE, NOT_AVAILABLE, NOT_AVAILABLE, NOT_AVAILABLE, NOT_AVAILABLE, NOT_AVAILABLE, NOT_AVAILABLE, NOT_AVAILABLE, NOT_AVAILABLE);
     }
 
     @SuppressWarnings("unused")
@@ -199,20 +198,20 @@ public class LicenseService {
             throw new MissingLicenseException("No license found");
         }
         log.warn("@CircuitBreaker: called 'getLicenseFallback()' method ");
-        return new LicenseDTO(NOT_AVAILABLE, FAKE_DATA, FAKE_DATA, FAKE_DATA, FAKE_DATA, FAKE_DATA, FAKE_DATA, FAKE_DATA, FAKE_DATA, FAKE_DATA);
+        return new LicenseDTO(DESCRIPTION, NOT_AVAILABLE, NOT_AVAILABLE, NOT_AVAILABLE, NOT_AVAILABLE, NOT_AVAILABLE, NOT_AVAILABLE, NOT_AVAILABLE, NOT_AVAILABLE, NOT_AVAILABLE);
     }
 
     @SuppressWarnings("unused")
     private String deleteLicenseFallback(String licenseId, Throwable exception) {
         log.warn("@CircuitBreaker: called 'getLicenseFallback()' method ");
-        return NOT_AVAILABLE;
+        return DESCRIPTION;
     }
 
     @SuppressWarnings("unused")
     private List<LicenseDTO> getAllLicensesFallback(Throwable exception) {
         log.warn("@CircuitBreaker: called 'getAllLicensesFallback()' method ");
         List<LicenseDTO> licenseDTOS = new ArrayList<>();
-        LicenseDTO licenseDTO = new LicenseDTO(NOT_AVAILABLE, FAKE_DATA, FAKE_DATA, FAKE_DATA, FAKE_DATA, FAKE_DATA, FAKE_DATA, FAKE_DATA, FAKE_DATA, FAKE_DATA);
+        LicenseDTO licenseDTO = new LicenseDTO(DESCRIPTION, NOT_AVAILABLE, NOT_AVAILABLE, NOT_AVAILABLE, NOT_AVAILABLE, NOT_AVAILABLE, NOT_AVAILABLE, NOT_AVAILABLE, NOT_AVAILABLE, NOT_AVAILABLE);
         licenseDTOS.add(licenseDTO);
         return licenseDTOS;
     }
