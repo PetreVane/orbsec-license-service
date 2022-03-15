@@ -3,8 +3,9 @@
  *
  * DO NOT EDIT DIRECTLY
  */
-package com.orbsec.licensingservice.model;
+package com.orbsec.licensingservice.avro;
 
+import com.orbsec.licensingservice.model.ChangeType;
 import org.apache.avro.specific.SpecificData;
 import org.apache.avro.util.Utf8;
 import org.apache.avro.message.BinaryMessageEncoder;

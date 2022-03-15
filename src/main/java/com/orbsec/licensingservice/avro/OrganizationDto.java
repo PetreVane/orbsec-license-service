@@ -1,4 +1,4 @@
-package com.orbsec.licensingservice.model;
+package com.orbsec.licensingservice.avro;
 
 import lombok.Data;
 import org.springframework.data.redis.core.RedisHash;
