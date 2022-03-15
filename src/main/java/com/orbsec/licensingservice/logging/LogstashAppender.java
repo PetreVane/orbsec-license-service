@@ -1,5 +1,6 @@
 package com.orbsec.licensingservice.logging;
 
+import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
 import net.logstash.logback.appender.LogstashTcpSocketAppender;
 import net.logstash.logback.encoder.LogstashEncoder;
@@ -59,6 +60,7 @@ public class LogstashAppender {
                 logstashTcpSocketAppender.start();
 
                 loggerContext.getLogger(Logger.ROOT_LOGGER_NAME).addAppender(logstashTcpSocketAppender);
+                loggerContext.getLogger(Logger.ROOT_LOGGER_NAME).setLevel(Level.INFO);
 
             }
         }
