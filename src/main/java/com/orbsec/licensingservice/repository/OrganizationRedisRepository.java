@@ -1,6 +1,7 @@
 package com.orbsec.licensingservice.repository;
 
-import com.orbsec.licensingservice.avro.OrganizationDto;
+
+import com.orbsec.licensingservice.model.OrganizationDto;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 

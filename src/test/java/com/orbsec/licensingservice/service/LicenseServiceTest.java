@@ -14,7 +14,7 @@ import static org.mockito.Mockito.when;
 import com.orbsec.licensingservice.exception.MissingLicenseException;
 import com.orbsec.licensingservice.model.License;
 import com.orbsec.licensingservice.model.LicenseDTO;
-import com.orbsec.licensingservice.avro.OrganizationDto;
+import com.orbsec.licensingservice.model.OrganizationDto;
 import com.orbsec.licensingservice.repository.LicenseRepository;
 import com.orbsec.licensingservice.service.client.OrganizationFeignClient;
 

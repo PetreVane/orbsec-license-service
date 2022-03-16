@@ -1,6 +1,6 @@
 package com.orbsec.licensingservice.service;
 
-import com.orbsec.licensingservice.avro.OrganizationDto;
+import com.orbsec.licensingservice.model.OrganizationDto;
 import com.orbsec.licensingservice.repository.OrganizationRedisRepository;
 import io.github.resilience4j.bulkhead.annotation.Bulkhead;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;

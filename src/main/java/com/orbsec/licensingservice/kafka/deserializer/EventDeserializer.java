@@ -1,7 +1,7 @@
 package com.orbsec.licensingservice.kafka.deserializer;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.orbsec.licensingservice.avro.OrganizationChangeEvent;
+import com.orbsec.licensingservice.avro.model.OrganizationChangeEvent;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.common.header.Headers;
 import org.apache.kafka.common.serialization.Deserializer;

@@ -8,7 +8,7 @@ import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
-import com.orbsec.licensingservice.avro.OrganizationDto;
+import com.orbsec.licensingservice.model.OrganizationDto;
 import com.orbsec.licensingservice.repository.OrganizationRedisRepository;
 
 import java.util.Optional;

@@ -1,8 +1,9 @@
 package com.orbsec.licensingservice.kafka;
 
 
-import com.orbsec.licensingservice.model.ChangeType;
-import com.orbsec.licensingservice.avro.OrganizationChangeEvent;
+
+import com.orbsec.licensingservice.avro.model.ChangeType;
+import com.orbsec.licensingservice.avro.model.OrganizationChangeEvent;
 import com.orbsec.licensingservice.service.LicenseService;
 import com.orbsec.licensingservice.service.RedisService;
 import lombok.extern.slf4j.Slf4j;
